@@ -6,7 +6,7 @@
 /*   By: bledda <bledda@student.42nice.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/30 11:33:14 by bledda            #+#    #+#             */
-/*   Updated: 2021/03/30 18:43:40 by bledda           ###   ########.fr       */
+/*   Updated: 2021/03/31 15:10:47 by bledda           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,3 +34,12 @@ void	*ft_memset(void *b, int c, size_t len)
 	return (b);
 }
 
+size_t	ft_strlen(const char *s)
+{
+	size_t	i;
+
+	i = 0;
+	while (s[i] != '\0')
+		i++;
+	return (i);
+}
