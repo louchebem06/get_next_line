@@ -6,7 +6,7 @@
 /*   By: bledda <bledda@student.42nice.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/30 11:33:26 by bledda            #+#    #+#             */
-/*   Updated: 2021/03/31 18:24:30 by bledda           ###   ########.fr       */
+/*   Updated: 2021/04/06 00:22:29 by bledda           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,61 +14,38 @@
 
 int	get_next_line(int fd, char **line)
 {
-	char 		buffer[BUFFER_SIZE + 1];
-	int 		read_fd;
-	static int 	cursor = 0;
-	static int	first_dim = 1;
-	int i;
+	int			size_read ;
+	char		buffer[BUFFER_SIZE + 1];
+	static char	*current_line = 0;
+	char		*tmp;
 
-	i = 0;
-	read_fd = read(fd, buffer, BUFFER_SIZE);
-	if (fd == -1 || read_fd < 0)
-		return (-1);
-	while (buffer[cursor] != 0 && cursor <= BUFFER_SIZE)
+	size_read = 1;
+	if (current_line == 0)
+		current_line = ft_calloc(sizeof(char), 1);
+	while (ft_strchr(current_line, '\n') == 0 && size_read > 0)
 	{
-		if (buffer[cursor] == '\n')
+		size_read = read(fd, buffer, BUFFER_SIZE);
+		buffer[size_read] = 0;
+		tmp = ft_strjoin(current_line, buffer);
+		free(current_line);
+		current_line = tmp;
+		if (size_read == 0)
 		{
-			line = malloc(sizeof(char *) * first_dim + 1);
-			if (line == 0)
-				return (-1);
-			line = 0;
-			line[first_dim - 1] = malloc(sizeof(char) * i + 1);
-			if (line[first_dim - 1] == 0)
-				return (-1);
-			line[first_dim - 1][i] = 0;
-			while (i >= 0)
-			{
-				if (cursor - 1 < 0)
-					line[first_dim - 1][i] = 0;
-				else
-					line[first_dim - 1][i] = buffer[cursor - 1];
-				i--;
-				cursor--;
-			}
-			while (buffer[cursor] != '\n')
-				cursor++;
-			cursor++;
-			first_dim++;
-			return (1);
+			*line = ft_strdup(current_line);
+			free(current_line);
+			current_line = 0;
+			return (0);
 		}
-		i++;
-		cursor++;
 	}
-	return (0);
+	if (size_read > 0)
+	{
+		*line = ft_substr(current_line, 0, (ft_strchr(current_line, '\n') - current_line));
+		tmp = ft_strdup(current_line + (ft_strlen(*line) + 1));
+		free(current_line);
+		current_line = tmp;
+		return (1);
+	}
+	if (fd == -1)
+		free(current_line);
+	return (-1);
 }
-
-/*
-int get_next_line(int fd, char **line);
-Fichiers de rendu get_next_line.c, get_next_line_utils.c,
-get_next_line.h
-ParamËtres #1. le file descriptor sur lequel lire
-#2. La valeur de ce qui a ÈtÈ lu
-Valeur de retour 1 : Une ligne a ÈtÈ lue
-0 : La fin de fichier a ÈtÈ atteinte
--1 : Une erreur est survenue
-Fonctions externes autorisÈes
-read, malloc, free
-Description Ecrivez une fonction qui retourne une ligne lue
-depuis un file descriptor, sans le retour a la
-ligne
-*/
